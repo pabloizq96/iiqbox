@@ -1,5 +1,4 @@
 # Script para la instalación de SailPoint IIQ 
-#### Autor: Pablo Izquierdo (pizquierdo@deloitte.es)
 
 ## Introducción
 Este script automatiza la instalación de SailPoint IIQ para una máquina Linux con sistema operativo CentOS. Además de IIQ, se instalan automáticamente sus dependencias: java, el servidor de aplicaciones (Tomcat) y la base de datos (MySQL). Además permite instalar de manera opcional un servidor apache para usarlo como reverse proxy y permitir conexiones HTTPS.
@@ -24,15 +23,3 @@ El script está dividido en varios ficheros.
 5. tomcatSetup.sh: instala el servidor de aplicaciones tomcat.
 6. mysqlSetup.sh: instala la base de datos, en este caso, MySQL.
 7. iiqSetup.sh: instala SailPoint IIQ y carga la configuración inicial. La versión y el parche instalados se especifican en el fichero setupEnv. **Nota:** a diferencia del resto de componentes, para la instalación de IIQ es necesario descargar el zip de instalación y el jar del parche y ponerlos en la ruta *images/identityiq* para que el script los detecte. 
-
-## Instalación de las guest additions
-Si al levantar la máquina virtual con vagrant nos sale algún error al instalar las guest additions o al intentar montar el directorio `/vagrant` debemos hacer lo siguente:
-
-1. Levantar la VM con `vagrant up`.
-2. Entrar a ella con `vagrant ssh`.
-3. Ejecutar los siguientes comandos:
-```
-sudo yum install -y epel-release gcc make perl kernel-devel kernel-headers bzip2 dkms
-sudo yum update -y kernel-*
-```
-4. Cerrar la sesión ssh y desde el host ejecutar `vagrant reload`.
