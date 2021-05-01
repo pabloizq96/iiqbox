@@ -44,8 +44,10 @@ if [[ "$INSTIIQ" == "true" ]] ; then
 fi
 
 # Create IIQ helper aliases
-sudo cat > /etc/profile.d/aliases.sh <<EOF
-    alias iiqlog='sudo tail -f /opt/tomcat/logs/catalina.out'
-    alias iiqless='sudo less /opt/tomcat/logs/catalina.out'
-    alias iiqconsole='cd /opt/tomcat/webapps/identityiq/WEB-INF/bin && ./iiq console -j && cd'
-EOF
+sudo bash -c ' cat > /etc/profile.d/aliases.sh <<EOF
+    alias iiqlog="sudo tail -f /opt/tomcat/logs/catalina.out"
+    alias iiqless="sudo less /opt/tomcat/logs/catalina.out"
+    alias iiqconsole="cd /opt/tomcat/webapps/identityiq/WEB-INF/bin && ./iiq console -j && cd"
+EOF'
+
+source /etc/profile

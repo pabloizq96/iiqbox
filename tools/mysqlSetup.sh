@@ -57,6 +57,16 @@ mysql -u root --skip-password < mysql_setup.sql
 #    mysql+=( -p"${MYSQLPW}" ) 
 #fi
 
+if ! kill -s TERM "$pid" || ! wait "$pid"; then
+    echo >&2 "MySQL init process failed"
+    exit 1
+fi
+chown -R mysql:mysql "$DATADIR"
+echo "MySQL installed with root password: ${MYSQLPW}"
+rm mysql_setup.sql
+
+service mysqld start
+
 # Set timezone & recommended settings
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p$MYSQLPW mysql
 echo "default-time-zone = Europe/Madrid" >> /etc/my.cnf.d/mysql-server.cnf
@@ -75,13 +85,5 @@ echo "innodb_lock_wait_timeout = 50" >> /etc/mysql/my.cnf && \
 echo "server-id=1" >> /etc/mysql/my.cnf && \
 echo "sql_mode=NO_ENGINE_SUBSTITUTION" >> /etc/mysql/my.cnf
 
-if ! kill -s TERM "$pid" || ! wait "$pid"; then
-    echo >&2 "MySQL init process failed"
-    exit 1
-fi
-chown -R mysql:mysql "$DATADIR"
-echo "MySQL installed with root password: ${MYSQLPW}"
-rm mysql_setup.sql
-
-service mysqld start
+service mysql restart
 systemctl enable mysqld

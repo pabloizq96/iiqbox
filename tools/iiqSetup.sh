@@ -36,7 +36,7 @@ echo "GA install file deployed"
 echo "Creating identityiq database"
 cd ${TCTHOME}/webapps/${WEBAPPDIR}/WEB-INF/database
 if [[ "$IIQDBTYPE" == "mysql" ]]; then
-    mysql --user=root --password=$MYSQLPW < create_identityiq_tables-${IIQVERSION}.mysql
+    mysql --user=root --password=$MYSQLPW -f -v < create_identityiq_tables-${IIQVERSION}.mysql
 elif [[ "$IIQDBTYPE" == "oracle" ]]; then
     source /u01/app/oracle/product/11.2.0/xe/bin/oracle_env.sh
     sed -i -e 's/-- CREATE/CREATE/g' create_identityiq_tables-${IIQVERSION}.oracle
