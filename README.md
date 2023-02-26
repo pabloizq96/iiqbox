@@ -1,25 +1,52 @@
-# Script para la instalación de SailPoint IIQ 
+# SailPoint IIQ Sandbox Vagrantfile
+Created by Pablo Izquierdo ([pizquierdo@deloitte.es](mailto://pizquierdo@deloitte.es))
 
-## Introducción
-Este script automatiza la instalación de SailPoint IIQ para una máquina Linux con sistema operativo CentOS. Además de IIQ, se instalan automáticamente sus dependencias: java, el servidor de aplicaciones (Tomcat) y la base de datos (MySQL). Además permite instalar de manera opcional un servidor apache para usarlo como reverse proxy y permitir conexiones HTTPS.
 
-Además de los scripts de instalación, en el repositorio se incluye un Vagrantfile para levantar una máquina de pruebas en el momento.
+## Features
+This repository contains everything needed for the creation of a sandbox environment of SailPoint IdentityIQ, including:
+- Centos8 server
+- Java 11 and Tomcat 9
+- MYSQL Database
+- OpenLDAP
+- Sample application data to test (`data` folder)
 
-## Ejecución
-Para ejecutar el script basta con usar el siguiente comando: 
+The script does not install SailPoint IdentityIQ software on the server.
+
+## Prerequisites
+In order to deploy the sandbox, you will need to have installed on your machine:
+- [Vagrant](https://www.vagrantup.com/)
+- [Virtualbox](https://www.virtualbox.org/)
+- [Vagrant vbguest plugin](https://github.com/dotless-de/vagrant-vbguest), to automatically install Vbox guest additions
+
+## Deployment
+0. Configure CPU and RAM for the VM in the Vagrantfile. Default is 8GB RAM and 4 CPU cores.
+1. Configure the following settings in `setenv.sh`:
+   - **TZONE:** for the timezone of the server and the database
+   - **TCVERSION:** tomcat9 latest version [Tomcat9 Downloads](https://tomcat.apache.org/download-90.cgi)
+   - **MYSQLPW:** password for the root account in the database
+   - **LDAPVER:** OpenLDAP latest version [OpenLDAP Downloads](https://www.openldap.org/software/download/)
+   - **LDAPPWD:** password for the Manager account in OpenLDAP. If you change it, make sure to also update the `slapd.ldif` file
+   - **Optional:** download the tomcat and openldap targz files and put them in the `images` folder. The scripts will use the downloaded version instead of fetching them.
+2. Open a terminal and run the following command to create the machine and provision it:
 ```
-sudo ./setupEnv.sh bootstrap.sh
+vagrant up
+```
+3. After a while, the machine is ready. Run the following command to connect to it. All the contents of the Vagrantfile folder are mapped to `/vagrant` inside the VM.
+```
+vagrant ssh
+```
+4. To shut down the VM, use the following command:
+```
+vagrant halt
 ```
 
-Una vez ha terminado la instalación podremos acceder a SailPoint en `http://<server_name>:8080/identityiq/` o en `https://<server_name>/identityiq/` si se ha activado la opción del reverse proxy. **Nota**: si estamos usando Vagrant podemos editar el fichero hosts de nuestra máquina para apuntar la dirección ip de la máquina virtual (192.168.56.50, por defecto) al dominio que queramos, por ejemplo, iiqbox.local.
+## Networking
+The Vagrantfile is configured to map some ports of the virtual machine to the host.
 
-## Configuración
-El script está dividido en varios ficheros.
-
-1. setupEnv.sh: fichero principal de configuración, que prepara las variables de entorno para la instalación de cada componente, por ejemplo, las versiones de los productos a instalar.  
-2. bootstrap.sh: fichero principal de instalación, que ejecuta el resto de scripts de cada componente, además de configurar otros aspectos generales del sistema.
-3. javaSetup.sh: instala java, por defecto, se instala el OpenJDK 1.8.
-4. httpdSetup.sh: instala el servidor apache y lo configura para usarlo como reverse proxy. Además genera certificados autofirmados.
-5. tomcatSetup.sh: instala el servidor de aplicaciones tomcat.
-6. mysqlSetup.sh: instala la base de datos, en este caso, MySQL.
-7. iiqSetup.sh: instala SailPoint IIQ y carga la configuración inicial. La versión y el parche instalados se especifican en el fichero setupEnv. **Nota:** a diferencia del resto de componentes, para la instalación de IIQ es necesario descargar el zip de instalación y el jar del parche y ponerlos en la ruta *images/identityiq* para que el script los detecte. 
+| VM Port | Host Port | Service                 |
+| ------- | --------- | ----------------------- |
+| 22      | 2222      | SSH (mapped by default) |
+| 389     | 10389     | LDAP                    |
+| 3306    | 3306      | MYSQL                   |
+| 8001    | 8001      | Tomcat Debug            |
+| 8080    | 8080      | Tomcat HTTP             |
